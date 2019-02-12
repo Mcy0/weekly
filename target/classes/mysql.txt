@@ -1,0 +1,37 @@
+create table w_user(
+id int not null auto_increment,
+user_name varchar(16),
+email varchar(32) not null unique,
+password varchar(18) not null,
+professional_class varchar(8),
+tel varchar(11),
+address varchar(20),
+learning_direction int(4),
+status int(4),
+state int(4),
+primary key(id)
+);
+create table w_task(
+id int not null auto_increment,
+user_id int not null,
+date date not null,
+name varchar(30),
+content varchar(255),
+complete_degree int,
+time_consuming int(4),
+primary key(id)
+);
+create table w_meeting(
+id int not null auto_increment,
+date date not null unique,
+user_id int,
+picture varchar(40),
+content varchar(800) not null,
+document_link varchar(255),
+primary key(id)
+);
+alter table w_task add constraint FK_Reference_1 foreign key(user_id)
+    references w_user(id) on delete cascade on update cascade;
+
+alter table w_meeting add constraint FK_Reference_2 foreign key(user_id)
+    references w_user(id) on delete set null on update cascade;

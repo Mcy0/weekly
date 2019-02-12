@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mcy.weekly.mapper.TaskMapper">
+    <resultMap id="taskMapper" type="task">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="taskDate" column="task_date" typeHandler="org.apache.ibatis.type.DateOnlyTypeHandler"/>
+        <result property="taskName" column="task_name" />
+        <result property="content" column="content" />
+        <result property="completeDegree" column="complete_degree" />
+        <result property="timeConsuming" column="time_consuming" />
+    </resultMap>
+    <insert id="insertTask" useGeneratedKeys="true" keyProperty="id">
+        insert w_task(user_id, task_date, task_name, content, complete_degree, time_consuming)
+        values (#{userId}, #{taskDate}, #{taskName}, #{content}, #{completeDegree}, #{timeConsuming})
+    </insert>
+    <select id="getAllTasks" resultMap="taskMapper">
+        select * from w_task order by task_date desc, user_id desc
+    </select>
+    <select id="getTaskByIdByUserId" resultMap="taskMapper">
+        select * from w_task where id = #{id} and user_id = #{userId}
+    </select>
+    <select id="getAllTasksByUserId" resultMap="taskMapper">
+        select * from w_task where user_id = #{userId} order by task_date desc, user_id desc
+    </select>
+    <select id="getTasks" resultMap="taskMapper">
+        select * from w_task where user_id = #{userId} and task_date >= #{startDate,typeHandler=org.apache.ibatis.type.DateOnlyTypeHandler} and  task_date >= #{endDate,typeHandler=org.apache.ibatis.type.DateOnlyTypeHandler} order by task_date
+    </select>
+    <delete id="deleteByIdByUserId">
+        delete from w_task where id = #{id} and user_id = #{userId}
+    </delete>
+    <update id="update">
+        update w_task
+        <set>
+            id = #{id},
+            <if test="taskDate != null">
+                task_date = #{taskDate}
+            </if>
+            <if test="taskName != null and taskName != ''">
+                task_name = #{taskName},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{contenr},
+            </if>
+            <if test="completeDegree != 0">
+                complete_degree = #{completeDegree},
+            </if>
+            <if test="timeConsuming != null and timeConsuming != ''">
+                time_consuming = #{timeConsuming}
+            </if>
+        </set>
+        where id = #{id} and user_id = #{userId}
+    </update>
+</mapper>

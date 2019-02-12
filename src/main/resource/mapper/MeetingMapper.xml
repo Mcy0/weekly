@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mcy.weekly.mapper.MeetingMapper">
+    <resultMap id="meetingMapper" type="meeting">
+        <id property="id" column="id" />
+        <result property="meetingDate" column="meeting_date" typeHandler="org.apache.ibatis.type.DateOnlyTypeHandler" />
+        <result property="userId" column="user_id" />
+        <result property="picture" column="picture" />
+        <result property="content" column="content" />
+        <result property="documentLink" column="document_link" />
+        <result property="userName" column="user_name" />
+    </resultMap>
+    <select id="getMeetings" resultMap="meetingMapper">
+          select m.* , u.user_name  from w_meeting m left join w_user u on m.user_id = u.id order by meeting_date desc
+    </select>
+    <select id="getMeetingByDate" resultMap="meetingMapper">
+        select * from w_meeting where meeting_date = #{meetingDate, typeHandler=org.apache.ibatis.type.DateOnlyTypeHandler}
+    </select>
+    <select id="getMeetingById" resultMap="meetingMapper">
+        select * from w_meeting where id = #{id}
+    </select>
+    <insert id="insertMeeting">
+        insert w_meeting(meeting_date, user_id, picture, content, document_link) values(
+        #{meetingDate}, #{userId},#{picture},#{content},#{documentLink}
+        )
+    </insert>
+    <delete id="deleteMeeting">
+        delete from w_meeting where id = #{id}
+    </delete>
+    <update id="updateMeeting">
+        update w_meeting
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="picture != null and picture != ''">
+                picture = #{picture},
+            </if>
+            <if test="documentLink != null and documentLink != ''">
+                document_link = #{documentLink},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

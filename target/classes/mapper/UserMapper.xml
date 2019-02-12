@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mcy.weekly.mapper.UserMapper">
+    <resultMap id="userMapper" type="user">
+        <id property="id" column="id" />
+        <result property="userName" column="user_name" />
+        <result property="email" column="email" />
+        <result property="professionalClass" column="professional_class" />
+        <result property="tel" column="tel" />
+        <result property="address" column="address" />
+        <result property="learningDirection" column="learning_direction" typeHandler="com.mcy.weekly.typeHandler.LearningDirectionEnumTypeHandler" />
+        <result property="status" column="status" typeHandler="com.mcy.weekly.typeHandler.StatusEnumTypeHandler" />
+        <result property="state" column="state" typeHandler="com.mcy.weekly.typeHandler.StateEnumTypeHandler" />
+    </resultMap>
+    <select id="getAll" resultMap="userMapper">
+        select * from w_user
+    </select>
+    <sql id="allColumns">
+        id, user_name, email, professional_class, tel, address, learning_direction, status, state
+    </sql>
+    <select id="getUserByEmailByPassword" resultMap="userMapper">
+        select  <include refid="allColumns" /> from w_user where email = #{email} and password = #{password}
+    </select>
+    <select id="getUserById"  resultMap="userMapper">
+        select <include refid="allColumns" /> from w_user where id = #{id}
+    </select>
+    <select id="getUserByEmail" resultMap="userMapper">
+        select <include refid="allColumns" /> from w_user where email = #{email}
+    </select>
+    <select id="getUserByUserParams" resultMap="userMapper">
+        <if test="userName != null and userName != ''">
+            <bind name="userName" value="'%' + userName + '%'" />
+        </if>
+        select <include refid="allColumns" /> from w_user
+        <where>
+            <if test="userName != null and userName != ''">
+                and user_name like #{userName}
+            </if>
+            <if test="learningDirection != null">
+                and learning_direction = #{learningDirection, typeHandler=com.mcy.weekly.typeHandler.LearningDirectionEnumTypeHandler}
+            </if>
+        </where>
+        order by learning_direction, email
+    </select>
+    <insert id="insertUserSim">
+        insert w_user(email, password, status, state)
+        values (#{email}, #{password},
+        #{status, typeHandler=com.mcy.weekly.typeHandler.StatusEnumTypeHandler},
+         #{state, typeHandler=com.mcy.weekly.typeHandler.StateEnumTypeHandler})
+    </insert>
+    <update id="updateUser" >
+        update w_user
+        <set>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="professionalClass != null and professionalClass != ''">
+                professional_class = #{professionalClass},
+            </if>
+            <if test="tel != null and tel != ''">
+                tel = #{tel},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="learningDirection != null">
+                learning_direction = #{learningDirection, typeHandler=com.mcy.weekly.typeHandler.LearningDirectionEnumTypeHandler},
+            </if>
+            <if test="state != null">
+                state = #{state, typeHandler=com.mcy.weekly.typeHandler.StateEnumTypeHandler}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateUserSim">
+        update w_user
+        <set>
+            <if test="state != null">
+                state = #{state, typeHandler=com.mcy.weekly.typeHandler.StateEnumTypeHandler},
+            </if>
+            <if test="status != null">
+                status = #{status, typeHandler=com.mcy.weekly.typeHandler.StatusEnumTypeHandler},
+            </if>
+            <if test="password != null">
+                password = #{password}
+            </if>
+        </set>
+        where email = #{email}
+    </update>
+    <update id="updateUserPassword">
+        update w_user set password = #{newPassword} where id = #{id}
+    </update>
+    <delete id="deleteUserById">
+        delete from w_user where id = #{id}
+    </delete>
+</mapper>
